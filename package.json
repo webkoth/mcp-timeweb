@@ -1,11 +1,11 @@
 {
-  "name": "timeweb-mcp-server",
+  "name": "@webkoth/mcp-timeweb",
   "version": "1.0.0",
   "description": "MCP server for Timeweb Cloud API integration",
   "type": "module",
   "main": "dist/index.js",
   "bin": {
-    "timeweb-mcp-server": "./dist/index.js"
+    "mcp-timeweb": "./dist/index.js"
   },
   "scripts": {
     "start": "node dist/index.js",
@@ -24,11 +24,11 @@
   ],
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/webkoth/timeweb-mcp-server.git"
+    "url": "git+https://github.com/webkoth/mcp-timeweb.git"
   },
-  "homepage": "https://github.com/webkoth/timeweb-mcp-server#readme",
+  "homepage": "https://github.com/webkoth/mcp-timeweb#readme",
   "bugs": {
-    "url": "https://github.com/webkoth/timeweb-mcp-server/issues"
+    "url": "https://github.com/webkoth/mcp-timeweb/issues"
   },
   "author": "Minas Sarkisyan <minas@webkoth.com> (https://github.com/webkoth)",
   "license": "MIT",
