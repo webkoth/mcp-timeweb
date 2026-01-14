@@ -11,17 +11,35 @@
     "start": "node dist/index.js",
     "dev": "tsx watch src/index.ts",
     "build": "tsc",
-    "clean": "rm -rf dist"
+    "clean": "rm -rf dist",
+    "prepublishOnly": "npm run build"
   },
   "engines": {
     "node": ">=18"
   },
+  "files": [
+    "dist",
+    "README.md",
+    "LICENSE"
+  ],
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/webkoth/timeweb-mcp-server.git"
+  },
+  "homepage": "https://github.com/webkoth/timeweb-mcp-server#readme",
+  "bugs": {
+    "url": "https://github.com/webkoth/timeweb-mcp-server/issues"
+  },
+  "author": "Minas Sarkisyan <minas@webkoth.com> (https://github.com/webkoth)",
+  "license": "MIT",
   "keywords": [
     "mcp",
     "timeweb",
     "cloud",
     "api",
-    "model-context-protocol"
+    "model-context-protocol",
+    "claude",
+    "anthropic"
   ],
   "dependencies": {
     "@modelcontextprotocol/sdk": "^1.6.1",
