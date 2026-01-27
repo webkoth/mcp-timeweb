@@ -485,3 +485,92 @@ export interface KnowledgeBase {
   tokens_used: number;
   tokens_limit: number;
 }
+
+// Firewall Group
+export interface FirewallGroup {
+  id: number;
+  name: string;
+  description: string | null;
+  is_default: boolean;
+  created_at: string;
+  incoming_traffic_policy: string;
+  outgoing_traffic_policy: string;
+  server_ids: number[];
+}
+
+// Firewall Rule
+export interface FirewallRule {
+  id: number;
+  direction: string;
+  protocol: string;
+  port: string | null;
+  cidr: string;
+  description: string | null;
+}
+
+// Server Log
+export interface ServerLog {
+  timestamp: string;
+  level: string;
+  message: string;
+}
+
+// Server Statistics
+export interface ServerStatistics {
+  cpu: {
+    percent: number;
+    timestamp: string;
+  }[];
+  ram: {
+    percent: number;
+    used: number;
+    total: number;
+    timestamp: string;
+  }[];
+  disk: {
+    percent: number;
+    used: number;
+    total: number;
+    timestamp: string;
+  }[];
+  network_rx: {
+    bytes: number;
+    timestamp: string;
+  }[];
+  network_tx: {
+    bytes: number;
+    timestamp: string;
+  }[];
+}
+
+// Database Backup
+export interface DatabaseBackup {
+  id: number;
+  name: string;
+  created_at: string;
+  status: string;
+  size: number;
+  type: string;
+  comment: string | null;
+}
+
+// Database Auto Backup Settings
+export interface DatabaseAutoBackupSettings {
+  is_enabled: boolean;
+  copy_count: number;
+  interval: string;
+  day_of_week: number | null;
+  start_at: string;
+}
+
+// Balancer Preset
+export interface BalancerPreset {
+  id: number;
+  description: string | null;
+  bandwidth: number;
+  replica_count: number;
+  request_per_second: number | null;
+  price: number;
+  currency: string;
+  location: string;
+}

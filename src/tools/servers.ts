@@ -2,7 +2,7 @@ import { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
 import { z } from "zod";
 import { makeApiRequest, formatBytes, buildPaginationResponse } from "../services/api.js";
 import { paginationSchema, responseFormatSchema, idSchema } from "../schemas/common.js";
-import { ResponseFormat, Server, ServerPreset, OsImage } from "../types.js";
+import { ResponseFormat, Server, ServerPreset, OsImage, ServerStatistics } from "../types.js";
 import { DEFAULT_LIMIT, MAX_LIMIT } from "../constants.js";
 
 function formatServer(srv: Server): string {
@@ -270,6 +270,122 @@ ${presets.map(p => `## ${p.description || "Preset"} (ID: ${p.id})
 - **Bandwidth:** ${p.bandwidth} Mbps
 - **Price:** ${p.price} ${p.currency}/month
 - **Location:** ${p.location}`).join("\n\n")}`;
+
+      return {
+        content: [{ type: "text" as const, text }]
+      };
+    }
+  );
+
+  // Get server logs
+  server.tool(
+    "timeweb_get_server_logs",
+    "Get logs from a cloud server",
+    {
+      server_id: idSchema("Server ID"),
+      limit: z.number().int().min(1).max(1000).optional().describe("Maximum number of log lines to return (default: 100, max: 1000)"),
+      order: z.enum(["asc", "desc"]).optional().describe("Sort order (default: desc - newest first)"),
+      format: responseFormatSchema
+    },
+    async (args) => {
+      const serverId = args.server_id as number;
+      const limit = args.limit || 100;
+      const order = args.order || "desc";
+      const format = (args.format as ResponseFormat) || ResponseFormat.MARKDOWN;
+
+      const response = await makeApiRequest<{ server_logs: Array<{ logged_at: string; message: string }> }>(
+        "GET",
+        `/api/v1/servers/${serverId}/logs`,
+        { limit, order }
+      );
+
+      const logs = response.server_logs || [];
+
+      if (format === ResponseFormat.JSON) {
+        return {
+          content: [{ type: "text" as const, text: JSON.stringify({ logs, server_id: serverId, count: logs.length }, null, 2) }]
+        };
+      }
+
+      if (logs.length === 0) {
+        return {
+          content: [{ type: "text" as const, text: `No logs found for server ${serverId}.` }]
+        };
+      }
+
+      const text = `# Server Logs (Server ${serverId})
+
+**Total entries:** ${logs.length}
+
+\`\`\`
+${logs.map(log => `[${log.logged_at}] ${log.message}`).join("\n")}
+\`\`\``;
+
+      return {
+        content: [{ type: "text" as const, text }]
+      };
+    }
+  );
+
+  // Get server statistics
+  server.tool(
+    "timeweb_get_server_statistics",
+    "Get resource usage statistics for a cloud server (CPU, RAM, Disk, Network)",
+    {
+      server_id: idSchema("Server ID"),
+      date_from: z.string().optional().describe("Start date for statistics in ISO format (e.g., '2024-01-01T00:00:00Z')"),
+      date_to: z.string().optional().describe("End date for statistics in ISO format"),
+      format: responseFormatSchema
+    },
+    async (args) => {
+      const serverId = args.server_id as number;
+      const format = (args.format as ResponseFormat) || ResponseFormat.MARKDOWN;
+
+      const params: Record<string, unknown> = {};
+      if (args.date_from) params.date_from = args.date_from;
+      if (args.date_to) params.date_to = args.date_to;
+
+      const response = await makeApiRequest<{ server_statistics: ServerStatistics }>(
+        "GET",
+        `/api/v1/servers/${serverId}/statistics`,
+        Object.keys(params).length > 0 ? params : undefined
+      );
+
+      const stats = response.server_statistics;
+
+      if (format === ResponseFormat.JSON) {
+        return {
+          content: [{ type: "text" as const, text: JSON.stringify({ statistics: stats, server_id: serverId }, null, 2) }]
+        };
+      }
+
+      // Calculate averages for markdown output
+      const avgCpu = stats.cpu?.length > 0
+        ? (stats.cpu.reduce((sum, c) => sum + c.percent, 0) / stats.cpu.length).toFixed(1)
+        : "N/A";
+      const avgRam = stats.ram?.length > 0
+        ? (stats.ram.reduce((sum, r) => sum + r.percent, 0) / stats.ram.length).toFixed(1)
+        : "N/A";
+      const avgDisk = stats.disk?.length > 0
+        ? (stats.disk.reduce((sum, d) => sum + d.percent, 0) / stats.disk.length).toFixed(1)
+        : "N/A";
+
+      const latestRam = stats.ram?.[stats.ram.length - 1];
+      const latestDisk = stats.disk?.[stats.disk.length - 1];
+
+      const text = `# Server Statistics (Server ${serverId})
+
+## Summary
+- **Average CPU Usage:** ${avgCpu}%
+- **Average RAM Usage:** ${avgRam}%${latestRam ? ` (${formatBytes(latestRam.used * 1024 * 1024)} / ${formatBytes(latestRam.total * 1024 * 1024)})` : ""}
+- **Average Disk Usage:** ${avgDisk}%${latestDisk ? ` (${formatBytes(latestDisk.used * 1024 * 1024)} / ${formatBytes(latestDisk.total * 1024 * 1024)})` : ""}
+
+## Data Points
+- **CPU samples:** ${stats.cpu?.length || 0}
+- **RAM samples:** ${stats.ram?.length || 0}
+- **Disk samples:** ${stats.disk?.length || 0}
+- **Network RX samples:** ${stats.network_rx?.length || 0}
+- **Network TX samples:** ${stats.network_tx?.length || 0}`;
 
       return {
         content: [{ type: "text" as const, text }]

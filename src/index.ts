@@ -28,6 +28,8 @@ import { registerSshKeyTools } from "./tools/ssh-keys.js";
 import { registerFloatingIpTools } from "./tools/floating-ips.js";
 import { registerLocationTools } from "./tools/locations.js";
 import { registerProjectTools } from "./tools/projects.js";
+import { registerFirewallTools } from "./tools/firewall.js";
+import { registerBalancerTools } from "./tools/balancers.js";
 
 // Server version
 const VERSION = "1.0.0";
@@ -71,6 +73,8 @@ async function main(): Promise<void> {
   registerFloatingIpTools(server);
   registerLocationTools(server);
   registerProjectTools(server);
+  registerFirewallTools(server);
+  registerBalancerTools(server);
 
   // Start the server with stdio transport
   const transport = new StdioServerTransport();
@@ -79,13 +83,15 @@ async function main(): Promise<void> {
   console.error(`Timeweb Cloud MCP Server v${VERSION} started`);
   console.error("Available tool categories:");
   console.error("  - Account & Billing (timeweb_get_account_status, timeweb_get_finances, ...)");
-  console.error("  - Cloud Servers (timeweb_list_servers, timeweb_create_server, ...)");
-  console.error("  - Databases (timeweb_list_databases, timeweb_create_database, ...)");
+  console.error("  - Cloud Servers (timeweb_list_servers, timeweb_get_server_logs, timeweb_get_server_statistics, ...)");
+  console.error("  - Databases (timeweb_list_databases, timeweb_list_database_backups, ...)");
   console.error("  - Kubernetes (timeweb_list_k8s_clusters, timeweb_create_k8s_cluster, ...)");
   console.error("  - S3 Storage (timeweb_list_s3_storages, timeweb_create_s3_storage, ...)");
   console.error("  - Domains (timeweb_list_domains, timeweb_list_dns_records, ...)");
   console.error("  - SSH Keys (timeweb_list_ssh_keys, timeweb_create_ssh_key, ...)");
   console.error("  - Floating IPs (timeweb_list_floating_ips, timeweb_bind_floating_ip, ...)");
+  console.error("  - Firewall (timeweb_list_firewall_groups, timeweb_create_firewall_rule, ...)");
+  console.error("  - Load Balancers (timeweb_list_balancers, timeweb_create_balancer, ...)");
   console.error("  - Locations (timeweb_list_locations)");
   console.error("  - Projects (timeweb_list_projects, timeweb_create_project, ...)");
 }
