@@ -30,6 +30,8 @@ import { registerLocationTools } from "./tools/locations.js";
 import { registerProjectTools } from "./tools/projects.js";
 import { registerFirewallTools } from "./tools/firewall.js";
 import { registerBalancerTools } from "./tools/balancers.js";
+import { registerDiskTools } from "./tools/disks.js";
+import { registerVpcTools } from "./tools/vpc.js";
 
 // Server version
 const VERSION = "1.0.0";
@@ -75,6 +77,8 @@ async function main(): Promise<void> {
   registerProjectTools(server);
   registerFirewallTools(server);
   registerBalancerTools(server);
+  registerDiskTools(server);
+  registerVpcTools(server);
 
   // Start the server with stdio transport
   const transport = new StdioServerTransport();
@@ -92,6 +96,8 @@ async function main(): Promise<void> {
   console.error("  - Floating IPs (timeweb_list_floating_ips, timeweb_bind_floating_ip, ...)");
   console.error("  - Firewall (timeweb_list_firewall_groups, timeweb_create_firewall_rule, ...)");
   console.error("  - Load Balancers (timeweb_list_balancers, timeweb_create_balancer, ...)");
+  console.error("  - Server Disks (timeweb_list_server_disks, timeweb_create_server_disk, ...)");
+  console.error("  - VPC (timeweb_list_vpcs, timeweb_create_vpc, timeweb_list_vpc_services, ...)");
   console.error("  - Locations (timeweb_list_locations)");
   console.error("  - Projects (timeweb_list_projects, timeweb_create_project, ...)");
 }
